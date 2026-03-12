@@ -1,0 +1,79 @@
+<!--____________________________________-->
+<!--Web Interface Structure-->
+<!--____________________________________-->
+<!--This file defines the layout of the prediction tool. -->
+<!--It includes input fields for area (sqft), -->
+<!--radio buttons for BHK and bathrooms, a-->
+<!--dynamic dropdown for locations, and a button to trigger the prediction.-->
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bangalore House Price Predictor</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="app.js"></script>
+    <link rel="stylesheet" href="app.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="bg-image"></div>
+    <div class="container">
+        <div class="card">
+            <h1>Bangalore House Price Predictor</h1>
+
+            <div class="input-group">
+                <label>Area (Square Feet)</label>
+                <input type="number" id="uiSqft" class="input-field" placeholder="Tusaale: 1000" value="1000">
+            </div>
+
+            <div class="input-group">
+                <label>BHK (Qolalka Hurdada)</label>
+                <div class="switch-field" id="uiBHK">
+                    <input type="radio" id="radio-bhk-1" name="uiBHK" value="1"/>
+                    <label for="radio-bhk-1">1</label>
+                    <input type="radio" id="radio-bhk-2" name="uiBHK" value="2" checked/>
+                    <label for="radio-bhk-2">2</label>
+                    <input type="radio" id="radio-bhk-3" name="uiBHK" value="3"/>
+                    <label for="radio-bhk-3">3</label>
+                    <input type="radio" id="radio-bhk-4" name="uiBHK" value="4"/>
+                    <label for="radio-bhk-4">4</label>
+                    <input type="radio" id="radio-bhk-5" name="uiBHK" value="5"/>
+                    <label for="radio-bhk-5">5</label>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>Bath (Musqulaha)</label>
+                <div class="switch-field" id="uiBathrooms">
+                    <input type="radio" id="radio-bath-1" name="uiBathrooms" value="1"/>
+                    <label for="radio-bath-1">1</label>
+                    <input type="radio" id="radio-bath-2" name="uiBathrooms" value="2" checked/>
+                    <label for="radio-bath-2">2</label>
+                    <input type="radio" id="radio-bath-3" name="uiBathrooms" value="3"/>
+                    <label for="radio-bath-3">3</label>
+                    <input type="radio" id="radio-bath-4" name="uiBathrooms" value="4"/>
+                    <label for="radio-bath-4">4</label>
+                    <input type="radio" id="radio-bath-5" name="uiBathrooms" value="5"/>
+                    <label for="radio-bath-5">5</label>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>Location (Xaafadda)</label>
+                <select class="input-field" id="uiLocations">
+                    <option value="" disabled selected>Dooro Xaafadda...</option>
+                </select>
+            </div>
+
+            <button class="submit-btn" onclick="onClickedEstimatePrice()" type="button">Xisaabi Qiimaha</button>
+
+            <div id="uiEstimatedPrice" class="result-area">
+                <h2>Qiimaha la qiyaasay: <span id="price-value">-</span> Lakhs</h2>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
