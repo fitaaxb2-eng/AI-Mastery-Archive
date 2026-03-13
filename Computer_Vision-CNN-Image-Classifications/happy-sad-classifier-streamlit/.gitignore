@@ -1,0 +1,21 @@
+# Ka saar folder-ka weyn ee sawirada
+data/
+
+# Ka saar folder-ka Virtual Environment-ka
+venv/
+ENV/
+env/
+
+# Ka saar logs-ka (TensorBoard)
+logs/
+
+# Ka saar Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Ka saar Python cache
+__pycache__/
+*.pyc
+
+# Ka saar faylasha nidaamka (System files)
+.DS_Store
+Thumbs.db
