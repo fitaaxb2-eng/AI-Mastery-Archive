@@ -1,86 +1,88 @@
 """
 ================================================================================
-Project: Video Action Recognition
-Module: 01 - CNN + LSTM (LRCN) Architecture
-Objective: Building a hybrid model that uses "Eyes" (CNN) to see frames
-           and "Memory" (LSTM) to understand the sequence of motion.
+project: Action Recognition (CNN + LSTM)
+TITLE: Building a Hybrid "LRCN" Architecture for Video Classification
+GOAL: To extract spatial features using CNN and temporal sequences using LSTM.
+      - CNN (MobileNetV2): Acts as the "Eyes" to see individual frames.
+      - LSTM: Acts as the "Memory" to understand movement over time.
 ================================================================================
 """
+
 # ------------------------------------------------------------------------------
-# STEP 1: Importing Essential Libraries
-# In this step, we load the "Engine" (TensorFlow) and the specific layers
-# needed to build our deep learning architecture.
+# STEP 1: Importing Necessary Libraries
+# We are importing TensorFlow and Keras components. These are the tools 
+# we need to build, layers, and compile our Deep Learning model.
 # ------------------------------------------------------------------------------
 import tensorflow as tf
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import (Conv2D, MaxPooling2D, LSTM, Dense,
+from tensorflow.keras.layers import (Conv2D, MaxPooling2D, LSTM, Dense, 
                                      Flatten, TimeDistributed, Dropout)
 from tensorflow.keras.applications import MobileNetV2
 
 # ------------------------------------------------------------------------------
-# STEP 2: Defining Data Shapes (Hyperparameters)
-# We define how many frames (images) are in a video and the size of each image.
-# This ensures the model knows the dimensions of the incoming video data.
+# STEP 2: Defining Hyperparameters (Input Shapes)
+# Here we define the dimensions of our video. Video data is 5D: 
+# (Batch_Size, Sequence_Length, Height, Width, Channels).
 # ------------------------------------------------------------------------------
-NUM_FRAMES = 20    # Number of images per video sequence
-IMG_HEIGHT = 224   # Input height for the CNN
-IMG_WIDTH = 224    # Input width for the CNN
-CHANNELS = 3       # RGB color (Red, Green, Blue)
-NUM_CLASSES = 5    # The number of actions we want to classify
+NUM_FRAMES = 20    # We take 20 frames per video to recognize the action
+IMG_HEIGHT = 224   # Standard height for MobileNetV2 input
+IMG_WIDTH = 224    # Standard width for MobileNetV2 input
+CHANNELS = 3       # RGB Color channels (Red, Green, Blue)
+NUM_CLASSES = 5    # The number of actions we want the model to learn
 
 # ------------------------------------------------------------------------------
-# STEP 3: Initializing the CNN Backbone (The Vision Part)
-# We use a pre-trained "MobileNetV2" model. This model has already seen
-# millions of images, so it acts as the "Eyes" of our system.
+# STEP 3: Initializing the CNN Backbone (Feature Extractor)
+# We use MobileNetV2, which is a pre-trained model. It already knows how to 
+# recognize shapes and objects from millions of images (ImageNet).
 # ------------------------------------------------------------------------------
-# include_top=False means we remove the classification layer of MobileNet
-video_cnn = MobileNetV2(weights='imagenet', include_top=False,
+# We set include_top=False to remove the final classification layer.
+video_cnn = MobileNetV2(weights='imagenet', include_top=False, 
                          input_shape=(IMG_HEIGHT, IMG_WIDTH, CHANNELS))
 
-# We freeze the weights because we don't want to retrain the CNN from scratch.
-video_cnn.trainable = False
+# Freeze the weights so we don't change the CNN's existing knowledge.
+video_cnn.trainable = False 
 
 # ------------------------------------------------------------------------------
-# STEP 4: Constructing the LRCN Architecture (CNN + LSTM)
-# This is the core structure. We use 'TimeDistributed' to apply the CNN
-# to every single frame of the video sequence.
+# STEP 4: Building the Main Sequential Model
+# We use 'TimeDistributed' to wrap our CNN. This allows the model to process 
+# each of the 20 frames through the same CNN weights sequentially.
 # ------------------------------------------------------------------------------
-model = Sequential(name="Action_Recognition_Net")
+model = Sequential(name="Action_Recognition_Model")
 
-# Applying the CNN to all 20 frames
+# Apply CNN to every frame in the sequence
 model.add(TimeDistributed(video_cnn, input_shape=(NUM_FRAMES, IMG_HEIGHT, IMG_WIDTH, CHANNELS)))
 
-# Flattening the features so the LSTM can process them as a list (vector)
+# Flatten the CNN output so it can be fed into the LSTM
 model.add(TimeDistributed(Flatten()))
 
 # ------------------------------------------------------------------------------
-# STEP 5: Adding the Memory Layer (LSTM)
-# The LSTM connects the frames together to understand the "Motion".
+# STEP 5: Temporal Learning with LSTM (The Memory)
+# The LSTM layer looks at how the features change from frame 1 to frame 20. 
+# This is how the model understands "Action" or "Motion".
 # ------------------------------------------------------------------------------
-model.add(LSTM(64, return_sequences=False)) # 64 neurons for memory
-model.add(Dropout(0.5))                      # Prevents the model from memorizing (overfitting)
+model.add(LSTM(64, return_sequences=False)) # 64 units of long-term memory
+model.add(Dropout(0.5))                      # Prevents overfitting (memorization)
 
 # ------------------------------------------------------------------------------
-# STEP 6: Final Decision Layers (Output)
-# These layers translate the LSTM's memory into a final prediction.
+# STEP 6: Classification and Decision Making
+# These final 'Dense' layers act as the brain's decision-making center 
+# to finalize which action category the video belongs to.
 # ------------------------------------------------------------------------------
-model.add(Dense(128, activation='relu'))      # Extra learning layer
-model.add(Dense(NUM_CLASSES, activation='softmax')) # Outputting probabilities for each action
+model.add(Dense(128, activation='relu'))      # Extra learning layer for complex patterns
+model.add(Dense(NUM_CLASSES, activation='softmax')) # Final probability for each class
 
 # ------------------------------------------------------------------------------
 # STEP 7: Model Compilation
-# We tell the model how to learn (Adam optimizer) and how to measure its
-# mistakes (Crossentropy loss).
+# We tell the model to use the 'Adam' optimizer to learn and 
+# 'Categorical Crossentropy' to calculate the error during training.
 # ------------------------------------------------------------------------------
 model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
 
-# Show the summary of the model layers
+# Show the complete structure of our model
 model.summary()
 
 """
-QUICK SUMMARY:
-1. CNN (MobileNetV2): Extracts visual features from single frames.
-2. TimeDistributed: Acts as a bridge to process multiple frames through the CNN.
-3. LSTM: Connects the frames over time to understand "Motion" or "Action".
-4. Dense: Makes the final decision on what action is being performed.
+FINAL NOTES:
+1. Spatial Features: Handled by CNN (Eyes).
+2. Temporal Features: Handled by LSTM (Memory).
 """
